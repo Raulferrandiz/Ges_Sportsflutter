@@ -1,0 +1,18 @@
+[
+  {
+    "id": "user_1",
+    "nombre": "Ana",
+    "rol": "admin",
+    "imagen": "ana.png",
+    "colorfondo": 4280391411,
+    "activo": true
+  },
+  {
+    "id": "user_2",
+    "nombre": "Luis",
+    "rol": "user",
+    "imagen": "luis.png",
+    "colorfondo": 4283215696,
+    "activo": true
+  }
+]
