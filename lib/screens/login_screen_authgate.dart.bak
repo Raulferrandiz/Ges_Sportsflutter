@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:login/services/auth_service.dart';
-import 'package:login/screens/registro/register_screen_authgate.dart';
 
 class LoginScreenAuthgate extends StatefulWidget {
   const LoginScreenAuthgate({super.key});
@@ -18,40 +16,39 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
   bool _loading = false;
   String _error = '';
 
-  Future<void> _login() async {
+  Future<void> _login({required bool register}) async {
     setState(() {
       _loading = true;
       _error = '';
     });
 
     try {
-      await _authService.signIn(_emailCtrl.text.trim(), _passCtrl.text);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login correcto'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      final msg = switch (e.code) {
-        'invalid-email'      => 'El email no tiene un formato válido.',
-        'user-not-found'     => 'No existe ninguna cuenta con ese email.',
-        'wrong-password'     => 'Contraseña incorrecta.',
-        'invalid-credential' => 'Email o contraseña incorrectos.',
-        'too-many-requests'  => 'Demasiados intentos. Espera unos minutos.',
-        'user-disabled'      => 'Esta cuenta está desactivada.',
-        _                    => 'Error: ${e.message ?? e.code}',
-      };
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(msg), backgroundColor: Colors.red),
-      );
-      setState(() => _error = msg);
+      if (register) {
+        await _authService.signUp(_emailCtrl.text.trim(), _passCtrl.text);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Usuario creado correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        await _authService.signIn(_emailCtrl.text.trim(), _passCtrl.text);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login correcto'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error inesperado: $e'), backgroundColor: Colors.red),
+        const SnackBar(
+          content: Text('Email o contraseña incorrectos'),
+          backgroundColor: Colors.red,
+        ),
       );
       setState(() => _error = e.toString());
     } finally {
@@ -97,9 +94,9 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
                 TextField(
                   controller: _emailCtrl,
-                  keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Introduce el correo:',
                     hintText: 'Correo',
@@ -120,7 +117,9 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 if (_loading)
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
@@ -131,7 +130,7 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: _login,
+                      onPressed: () => _login(register: false),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accent,
                         shape: const StadiumBorder(),
@@ -145,15 +144,7 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      // ✅ Navega a la pantalla de registro en vez de registrar aquí
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const RegisterScreenAuthgate(),
-                          ),
-                        );
-                      },
+                      onPressed: () => _login(register: true),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: accent,
                         shape: const StadiumBorder(),
@@ -191,6 +182,7 @@ class _LoginScreenAuthgateState extends State<LoginScreenAuthgate> {
                     ),
                   ),
                 ],
+
                 if (_error.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
