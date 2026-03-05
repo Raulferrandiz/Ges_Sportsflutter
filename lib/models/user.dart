@@ -4,8 +4,6 @@ class User {
   final String email;
   final String nombre;
   final String rol;
-  final String imagen;
-  final int colorfondo;
   bool activo;
 
   User({
@@ -13,8 +11,6 @@ class User {
     required this.email,
     required this.nombre,
     required this.rol,
-    required this.imagen,
-    required this.colorfondo,
     this.activo = true,
   });
 
@@ -24,8 +20,6 @@ class User {
       email: map['email'] ?? '',
       nombre: map['nombre'] ?? '',
       rol: map['rol'] ?? '',
-      imagen: map['imagen'] ?? 'assets/images/jugador.png',
-      colorfondo: map['colorfondo'] ?? 1,
       activo: map['activo'] ?? true,
     );
   }
@@ -36,8 +30,6 @@ class User {
       email: (map['email'] ?? '') as String,
       nombre: (map['nombre'] ?? '') as String,
       rol: (map['rol'] ?? '') as String,
-      imagen: (map['imagen'] ?? 'assets/images/jugador.png') as String,
-      colorfondo: (map['colorfondo'] ?? 1) as int,
       activo: (map['activo'] ?? true) as bool,
     );
   }
@@ -47,8 +39,6 @@ class User {
       'email': email,
       'nombre': nombre,
       'rol': rol,
-      'imagen': imagen,
-      'colorfondo': colorfondo,
       'activo': activo,
     };
   }
@@ -57,8 +47,6 @@ class User {
     String? email,
     String? nombre,
     String? rol,
-    String? imagen,
-    int? colorfondo,
     bool? activo,
   }) {
     return User(
@@ -66,8 +54,6 @@ class User {
       email: email ?? this.email,
       nombre: nombre ?? this.nombre,
       rol: rol ?? this.rol,
-      imagen: imagen ?? this.imagen,
-      colorfondo: colorfondo ?? this.colorfondo,
       activo: activo ?? this.activo,
     );
   }

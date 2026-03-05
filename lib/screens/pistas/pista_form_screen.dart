@@ -1,68 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:login/providers/user_provider.dart';
-import 'package:login/models/user.dart';
+import 'package:login/models/pista.dart';
+import 'package:login/providers/pista_provider.dart';
 
 enum _BackAction { cancel, discard, save }
 
-class UserFormScreen extends StatefulWidget {
-  final User? userToEdit;
+class PistaFormScreen extends StatefulWidget {
+  const PistaFormScreen({super.key, this.pistaToEdit});
 
-  const UserFormScreen({super.key, this.userToEdit});
+  final Pista? pistaToEdit;
 
   @override
-  State<UserFormScreen> createState() => _UserFormScreenState();
+  State<PistaFormScreen> createState() => _PistaFormScreenState();
 }
 
-class _UserFormScreenState extends State<UserFormScreen> {
-  final _formKey = GlobalKey<FormState>();
-
+class _PistaFormScreenState extends State<PistaFormScreen> {
   static const Color appOrange = Color(0xFFF59E0B);
 
-  late final TextEditingController emailCtrl;
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController nombreCtrl;
+  late final TextEditingController direccionCtrl;
+  late final TextEditingController tipoCtrl;
 
-  late bool activo;
-  late String rolSeleccionado;
+  late bool activa;
 
-  late final String _initialEmail;
   late final String _initialNombre;
-  late final bool _initialActivo;
-  late final String _initialRol;
+  late final String _initialDireccion;
+  late final String _initialTipo;
+  late final bool _initialActiva;
 
-  bool get isEdit => widget.userToEdit != null;
+  bool get isEdit => widget.pistaToEdit != null;
 
   @override
   void initState() {
     super.initState();
 
-    emailCtrl = TextEditingController(text: widget.userToEdit?.email ?? '');
-    nombreCtrl = TextEditingController(text: widget.userToEdit?.nombre ?? '');
+    nombreCtrl = TextEditingController(text: widget.pistaToEdit?.nombre ?? '');
+    direccionCtrl = TextEditingController(text: widget.pistaToEdit?.direccion ?? '');
+    tipoCtrl = TextEditingController(text: widget.pistaToEdit?.tipo ?? '');
 
-    activo = widget.userToEdit?.activo ?? true;
+    activa = widget.pistaToEdit?.activa ?? true;
 
-    final rolInicial = (widget.userToEdit?.rol ?? 'jugador').toLowerCase();
-    const rolesValidos = {'admin', 'jugador', 'entrenador'};
-    rolSeleccionado = rolesValidos.contains(rolInicial) ? rolInicial : 'jugador';
-
-    _initialEmail = emailCtrl.text;
     _initialNombre = nombreCtrl.text;
-    _initialActivo = activo;
-    _initialRol = rolSeleccionado;
+    _initialDireccion = direccionCtrl.text;
+    _initialTipo = tipoCtrl.text;
+    _initialActiva = activa;
   }
 
   @override
   void dispose() {
-    emailCtrl.dispose();
     nombreCtrl.dispose();
+    direccionCtrl.dispose();
+    tipoCtrl.dispose();
     super.dispose();
   }
 
   bool get _hasUnsavedChanges {
-    return emailCtrl.text != _initialEmail ||
-        nombreCtrl.text != _initialNombre ||
-        activo != _initialActivo ||
-        rolSeleccionado != _initialRol;
+    return nombreCtrl.text != _initialNombre ||
+        direccionCtrl.text != _initialDireccion ||
+        tipoCtrl.text != _initialTipo ||
+        activa != _initialActiva;
   }
 
   Future<void> _handleBack() async {
@@ -110,24 +108,28 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Future<bool> _guardar({required bool popAfterSave}) async {
     if (!_formKey.currentState!.validate()) return false;
 
-    final provider = context.read<UserProvider>();
+    final provider = context.read<PistaProvider>();
 
+    final nombre = nombreCtrl.text.trim();
+    final direccion = direccionCtrl.text.trim();
+    final tipo = tipoCtrl.text.trim().toLowerCase(); 
     if (isEdit) {
-      final updated = widget.userToEdit!.copyWith(
-        nombre: nombreCtrl.text.trim(),
-        rol: rolSeleccionado,
-        activo: activo,
+      final updated = widget.pistaToEdit!.copyWith(
+        nombre: nombre,
+        direccion: direccion,
+        tipo: tipo,
+        activa: activa,
       );
       await provider.update(updated.id, updated);
     } else {
-      final newUser = User(
+      final newPista = Pista(
         id: '',
-        email: emailCtrl.text.trim().toLowerCase(),
-        nombre: nombreCtrl.text.trim(),
-        rol: rolSeleccionado,
-        activo: activo,
+        activa: activa,
+        direccion: direccion,
+        nombre: nombre,
+        tipo: tipo,
       );
-      await provider.add(newUser);
+      await provider.add(newPista);
     }
 
     if (popAfterSave && mounted) Navigator.pop(context);
@@ -136,7 +138,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final titleText = isEdit ? 'Editar usuario' : 'Nuevo usuario';
+    final titleText = isEdit ? 'Editar pista' : 'Nueva pista';
 
     return PopScope(
       canPop: false,
@@ -183,54 +185,28 @@ class _UserFormScreenState extends State<UserFormScreen> {
             child: Column(
               children: [
                 _input(
-                  controller: emailCtrl,
-                  label: 'Email',
-                  enabled: !isEdit,
-                  validator: (v) {
-                    final value = (v ?? '').trim();
-                    if (value.isEmpty) return 'Introduce un email';
-                    if (!value.contains('@')) return 'Email inválido';
-                    return null;
-                  },
+                  controller: nombreCtrl,
+                  label: 'Nombre',
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Introduce un nombre' : null,
                 ),
                 const SizedBox(height: 16),
                 _input(
-                  controller: nombreCtrl,
-                  label: 'Nombre',
-                  validator: (v) => v == null || v.isEmpty ? 'Introduce un nombre' : null,
+                  controller: direccionCtrl,
+                  label: 'Dirección / Identificador',
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: rolSeleccionado,
-                  decoration: InputDecoration(
-                    labelText: 'Rol',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'admin', child: Text('admin')),
-                    DropdownMenuItem(value: 'jugador', child: Text('jugador')),
-                    DropdownMenuItem(value: 'entrenador', child: Text('entrenador')),
-                  ],
-                  onChanged: (v) {
-                    if (v == null) return;
-                    setState(() => rolSeleccionado = v);
-                  },
+                _input(
+                  controller: tipoCtrl,
+                  label: 'Tipo (deporte)',
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Introduce un tipo (ej: padel)' : null,
                 ),
                 const SizedBox(height: 20),
                 _card(
                   child: SwitchListTile(
-                    title: const Text(
-                      'Usuario activo',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    value: activo,
+                    title: const Text('Pista activa', style: TextStyle(fontWeight: FontWeight.w600)),
+                    value: activa,
                     activeColor: appOrange,
-                    onChanged: (value) => setState(() => activo = value),
+                    onChanged: (v) => setState(() => activa = v),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -240,13 +216,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: appOrange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     ),
                     onPressed: () => _guardar(popAfterSave: true),
                     child: Text(
-                      isEdit ? 'GUARDAR CAMBIOS' : 'GUARDAR USUARIO',
+                      isEdit ? 'GUARDAR CAMBIOS' : 'GUARDAR PISTA',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -266,12 +240,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Widget _input({
     required TextEditingController controller,
     required String label,
-    bool enabled = true,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
-      enabled: enabled,
       validator: validator,
       decoration: InputDecoration(
         labelText: label,

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import '../../incidencias/mis_incidencias_screen.dart';
 import '../widgets/section_card.dart';
 
 class ProfileTab extends StatelessWidget {
@@ -45,11 +45,35 @@ class ProfileTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const SectionCard(
+        SectionCard(
           title: 'Incidencias',
           subtitle: 'Reporta un problema o avisa de una ausencia',
           icon: Icons.report_gmailerrorred_outlined,
-          body: Text('Formulario de incidencias (solo UI).'),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Crea y revisa tus incidencias enviadas.',
+                style: TextStyle(color: Colors.black87),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MisIncidenciasScreen()),
+                  );
+                },
+                icon: const Icon(Icons.list_alt),
+                label: const Text('Mis incidencias'),
+              ),
+            ],
+          ),
         ),
       ],
     );

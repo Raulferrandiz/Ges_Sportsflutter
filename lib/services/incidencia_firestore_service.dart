@@ -13,11 +13,11 @@ class IncidenciaFirestoreService {
   }
 
   Stream<List<Incidencia>> getIncidenciasByCreador(String creadorId) {
-    return _ref
-        .where('creadorID', isEqualTo: creadorId)
-        .orderBy('fecha', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map((d) => Incidencia.fromDoc(d)).toList());
+    return _ref.where('creadorID', isEqualTo: creadorId).snapshots().map((snap) {
+      final list = snap.docs.map((d) => Incidencia.fromDoc(d)).toList();
+      list.sort((a, b) => b.fecha.compareTo(a.fecha));
+      return list;
+    });
   }
 
   Future<String> addIncidencia(Incidencia incidencia) async {
@@ -28,5 +28,9 @@ class IncidenciaFirestoreService {
 
   Future<void> deleteIncidencia(String id) {
     return _ref.doc(id).delete();
+  }
+
+  Future<void> updateIncidencia(String id, Incidencia incidencia) {
+    return _ref.doc(id).update(incidencia.toMap());
   }
 }

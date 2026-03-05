@@ -6,13 +6,15 @@ import 'package:provider/provider.dart';
 import '../../../providers/reserva_provider.dart';
 
 class NextReservationsSection extends StatelessWidget {
-  const NextReservationsSection({super.key});
+  const NextReservationsSection({super.key, required this.userDocId});
+
+  final String userDocId;
 
   Future<void> _cancelReservation(BuildContext context, String reservaId) async {
     try {
       await context.read<ReservaProvider>().cancel(reservaId);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reserva cancelada ✅')),
+        const SnackBar(content: Text('Reserva cancelada')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,17 +59,15 @@ class NextReservationsSection extends StatelessWidget {
 
     final stream = FirebaseFirestore.instance
         .collection('reservas')
-        .where('activa', isEqualTo: true)
-        .where('userID', isEqualTo: user.uid)
         .where('startAt', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
         .orderBy('startAt')
-        .limit(5)
+        .limit(100)
         .snapshots();
 
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: stream,
       builder: (context, snap) {
-        if (snap.hasError) return const Text('Error cargando reservas.');
+        if (snap.hasError) return Text('Error cargando reservas: ${snap.error}');
         if (!snap.hasData) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
@@ -75,11 +75,25 @@ class NextReservationsSection extends StatelessWidget {
           );
         }
 
-        final docs = snap.data!.docs;
-        if (docs.isEmpty) return const Text('No tienes reservas próximas.');
+        final docsAll = snap.data!.docs;
+
+        final filtered = <QueryDocumentSnapshot<Map<String, dynamic>>>[];
+        for (final d in docsAll) {
+          final data = d.data();
+          final activa = (data['activa'] is bool) ? (data['activa'] as bool) : false;
+          if (!activa) continue;
+
+          final owner = (data['userID'] as String?) ?? '';
+          final isMine = owner == userDocId || owner == user.uid;
+
+          if (isMine) filtered.add(d);
+          if (filtered.length >= 5) break;
+        }
+
+        if (filtered.isEmpty) return const Text('No tienes reservas próximas.');
 
         return Column(
-          children: docs.map((doc) {
+          children: filtered.map((doc) {
             final data = doc.data();
             final pistaId = (data['pistaID'] as String?) ?? '';
             final deporte = (data['deporte'] as String?) ?? 'deporte';

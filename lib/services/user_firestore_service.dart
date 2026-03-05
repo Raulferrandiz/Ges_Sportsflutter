@@ -33,16 +33,28 @@ class UserFirestoreService {
     return _ref.doc(id).update(user.toMap());
   }
 
-  Future<void> deleteUser(String id) {
-    return _ref.doc(id).delete();
+  Future<void> deleteUser(String id) async {
+    final snap = await _ref.doc(id).get();
+    final data = snap.data();
+
+    if (data == null) return;
+
+    final rol = (data['rol'] ?? '').toString().trim().toLowerCase();
+    if (rol == 'admin') {
+      throw FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'permission-denied',
+        message: 'No se puede eliminar un usuario administrador.',
+      );
+    }
+
+    await _ref.doc(id).delete();
   }
 
   Stream<List<User>> getUsersByRol(String rol) {
-  return _ref
-      .where('rol', isEqualTo: rol)
-      .snapshots()
-      .map(
-        (snap) => snap.docs.map((doc) => User.fromDoc(doc.id, doc.data())).toList(),
-      );
-}
+    return _ref.where('rol', isEqualTo: rol).snapshots().map(
+          (snap) =>
+              snap.docs.map((doc) => User.fromDoc(doc.id, doc.data())).toList(),
+        );
+  }
 }

@@ -5,16 +5,12 @@ class PerfilCard extends StatelessWidget {
     super.key,
     required this.nombre,
     required this.rol,
-    required this.imagen,
-    required this.colorfondo,
     required this.activo,
     required this.onToggleActivo,
   });
 
   final String nombre;
   final String rol;
-  final String imagen;
-  final Color colorfondo;
   final bool activo;
   final VoidCallback onToggleActivo;
 
@@ -26,7 +22,7 @@ class PerfilCard extends StatelessWidget {
         height: 200,
         margin: const EdgeInsets.all(16),
         child: Card(
-          color: colorfondo,
+          color: const Color(0xFF111827),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
@@ -76,32 +72,10 @@ class PerfilCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Container(
-                  width: 140,
-                  height: 140,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF2979FF), Color(0xFF00BCD4)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        imagen,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/jugador.png', // imagen genérica
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                const CircleAvatar(
+                  radius: 70,
+                  backgroundColor: Color(0xFFE5E7EB),
+                  child: Icon(Icons.person, size: 70, color: Colors.black),
                 ),
               ],
             ),

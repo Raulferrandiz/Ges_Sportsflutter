@@ -33,4 +33,8 @@ class ReservaFirestoreService {
   Future<void> deleteReserva(String id) {
     return _ref.doc(id).delete();
   }
+
+  Future<void> updateReserva(String id, Reserva reserva) {
+    return _ref.doc(id).update(reserva.toMap());
+  }
 }

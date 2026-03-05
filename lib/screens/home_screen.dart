@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'home/tabs/home_tab.dart';
 import 'home/tabs/profile_tab.dart';
 import 'home/tabs/reservations_tab.dart';
@@ -9,10 +8,12 @@ class HomeScreen extends StatefulWidget {
     super.key,
     required this.rol,
     required this.email,
+    required this.userDocId,
   });
 
   final String rol;
   final String email;
+  final String userDocId;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,9 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
       HomeTab(
         rol: widget.rol,
         email: widget.email,
+        userDocId: widget.userDocId,
         onGoToReservations: () => setState(() => _index = 1),
       ),
-      const ReservationsTab(),
+      ReservationsTab(userDocId: widget.userDocId),
       ProfileTab(rol: widget.rol, email: widget.email),
     ];
 
@@ -38,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        //logo
         leadingWidth: 56,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
@@ -51,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        //titulo
         title: const Text(
           'GesSport',
           style: TextStyle(

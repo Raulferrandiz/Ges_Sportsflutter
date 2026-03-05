@@ -19,12 +19,16 @@ class AuthService {
     );
 
     final uid = cred.user!.uid;
+    final normalizedEmail = email.trim().toLowerCase();
 
-    await _db.collection('users').doc(uid).set({
-      'email': email,
-      'rol': 'pendiente', 
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('users').doc(uid).set(
+      {
+        'email': normalizedEmail,
+        'rol': 'jugador',
+        'activo': true,
+      },
+      SetOptions(merge: true),
+    );
 
     return cred;
   }

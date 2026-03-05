@@ -11,6 +11,7 @@ class ReservaProvider extends ChangeNotifier {
       _service.getReservasActivasByUser(userId);
 
   Future<String> add(Reserva reserva) => _service.addReserva(reserva);
+  Future<void> update(String id, Reserva reserva) => _service.updateReserva(id, reserva);
   Future<void> cancel(String reservaId) => _service.cancelReserva(reservaId);
   Future<void> delete(String id) => _service.deleteReserva(id);
 }

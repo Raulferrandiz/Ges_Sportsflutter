@@ -10,7 +10,9 @@ import '../../../providers/reserva_provider.dart';
 import '../widgets/section_card.dart';
 
 class ReservationsTab extends StatefulWidget {
-  const ReservationsTab({super.key});
+  const ReservationsTab({super.key, required this.userDocId});
+
+  final String userDocId;
 
   @override
   State<ReservationsTab> createState() => _ReservationsTabState();
@@ -123,13 +125,13 @@ class _ReservationsTabState extends State<ReservationsTab> {
         startAt: startAt,
         endAt: endAt,
         pistaID: _selectedPistaId!,
-        userID: user.uid,
+        userID: widget.userDocId,
       );
 
       await context.read<ReservaProvider>().add(reserva);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Reserva creada ✅')),
+        const SnackBar(content: Text('Reserva creada')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

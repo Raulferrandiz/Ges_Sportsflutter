@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:login/screens/login_screen_authgate.dart';
+import 'package:login/screens/login/login_screen_authgate.dart';
 
-/// Entry point for the login UI used by AuthGate.
-/// This keeps the file name the user expects: lib/screens/login.dart
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
@@ -17,7 +15,6 @@ class _LoginWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Reuse your existing working login implementation.
-    return LoginScreenAuthgate();
+    return const LoginScreenAuthgate();
   }
 }

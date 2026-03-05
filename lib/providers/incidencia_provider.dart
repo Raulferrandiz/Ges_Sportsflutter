@@ -12,4 +12,7 @@ class IncidenciaProvider extends ChangeNotifier {
 
   Future<String> add(Incidencia incidencia) => _service.addIncidencia(incidencia);
   Future<void> delete(String id) => _service.deleteIncidencia(id);
+
+  Future<void> update(String id, Incidencia incidencia) =>
+    _service.updateIncidencia(id, incidencia);
 }

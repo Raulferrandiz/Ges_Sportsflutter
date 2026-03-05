@@ -7,6 +7,13 @@ import 'package:login/screens/users/user_form_screen.dart';
 class UsersStfulScreen extends StatelessWidget {
   const UsersStfulScreen({super.key});
 
+  static const Color appOrange = Color(0xFFF59E0B);
+
+  void _handleBack(BuildContext context) {
+    final nav = Navigator.of(context);
+    if (nav.canPop()) nav.pop();
+  }
+
   Future<void> _confirmDelete(BuildContext context, User u) async {
     final ok = await showDialog<bool>(
       context: context,
@@ -27,11 +34,18 @@ class UsersStfulScreen extends StatelessWidget {
     );
 
     if (ok == true && context.mounted) {
-      context.read<UserProvider>().delete(u.id);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usuario eliminado')),
-      );
+      try {
+        await context.read<UserProvider>().delete(u.id);
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuario eliminado')),
+        );
+      } catch (e) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se pudo eliminar: $e')),
+        );
+      }
     }
   }
 
@@ -41,41 +55,50 @@ class UsersStfulScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F7F7),
-            appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        leadingWidth: 56,
-        //logo
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: Center(
-            child: Image.asset(
-              'assets/images/gesports.png', 
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: appOrange),
+              onPressed: () => _handleBack(context),
+              tooltip: 'Volver',
+            ),
+            Image.asset(
+              'assets/images/gesports.png',
               width: 28,
               height: 28,
               fit: BoxFit.contain,
             ),
-          ),
-        ),
-        //titulo
-        title: const Text(
-          'Usuarios',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            color: Color(0xFFF59E0B),
-          ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Usuarios',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: appOrange,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
+        backgroundColor: appOrange,
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const UserFormScreen()),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.black),
       ),
+
       body: StreamBuilder<List<User>>(
         stream: usersStream,
         builder: (context, snap) {
@@ -96,15 +119,10 @@ class UsersStfulScreen extends StatelessWidget {
 
               return Card(
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Color(u.colorfondo),
-                    child: Text(
-                      (u.nombre.isNotEmpty ? u.nombre[0] : '?').toUpperCase(),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
                   title: Text(u.nombre.isEmpty ? '(Sin nombre)' : u.nombre),
-                  subtitle: Text('${u.email}\nrol: ${u.rol} · activo: ${u.activo ? "sí" : "no"}'),
+                  subtitle: Text(
+                    '${u.email}\nrol: ${u.rol} · activo: ${u.activo ? "sí" : "no"}',
+                  ),
                   isThreeLine: true,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

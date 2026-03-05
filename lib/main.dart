@@ -3,16 +3,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
-import 'auth/auth_gate.dart';
-import 'services/user_firestore_service.dart';
-import 'services/pista_firestore_service.dart';
-import 'services/reserva_firestore_service.dart';
-import 'services/incidencia_firestore_service.dart';
-import 'providers/user_provider.dart';
-import 'providers/pista_provider.dart';
-import 'providers/reserva_provider.dart';
-import 'providers/incidencia_provider.dart';
+import 'package:login/firebase_options.dart';
+import 'package:login/auth/auth_gate.dart';
+import 'package:login/services/user_firestore_service.dart';
+import 'package:login/services/pista_firestore_service.dart';
+import 'package:login/services/reserva_firestore_service.dart';
+import 'package:login/services/incidencia_firestore_service.dart';
+import 'package:login/services/equipo_firestore_service.dart';
+import 'package:login/providers/user_provider.dart';
+import 'package:login/providers/pista_provider.dart';
+import 'package:login/providers/reserva_provider.dart';
+import 'package:login/providers/incidencia_provider.dart';
+import 'package:login/providers/equipo_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
         Provider(create: (_) => PistaFirestoreService()),
         Provider(create: (_) => ReservaFirestoreService()),
         Provider(create: (_) => IncidenciaFirestoreService()),
+        Provider(create: (_) => EquipoFirestoreService()),
+
         ChangeNotifierProvider(
           create: (ctx) => UserProvider(ctx.read<UserFirestoreService>()),
         ),
@@ -49,6 +53,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (ctx) => IncidenciaProvider(ctx.read<IncidenciaFirestoreService>()),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => EquipoProvider(ctx.read<EquipoFirestoreService>()),
         ),
       ],
       child: MaterialApp(

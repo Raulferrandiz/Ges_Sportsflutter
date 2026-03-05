@@ -9,6 +9,8 @@ class Reserva {
   final String pistaID;
   final String userID;
 
+  final String equipoID;
+
   const Reserva({
     required this.id,
     required this.activa,
@@ -17,6 +19,7 @@ class Reserva {
     required this.endAt,
     required this.pistaID,
     required this.userID,
+    this.equipoID = '',
   });
 
   factory Reserva.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
@@ -28,7 +31,6 @@ class Reserva {
     DateTime toDate(dynamic v) {
       if (v is Timestamp) return v.toDate();
       if (v is DateTime) return v;
-      // fallback seguro
       return DateTime.fromMillisecondsSinceEpoch(0);
     }
 
@@ -40,6 +42,7 @@ class Reserva {
       endAt: toDate(endTs),
       pistaID: (data['pistaID'] as String?) ?? '',
       userID: (data['userID'] as String?) ?? '',
+      equipoID: (data['equipoID'] as String?) ?? '',
     );
   }
 
@@ -51,6 +54,7 @@ class Reserva {
       'endAt': Timestamp.fromDate(endAt),
       'pistaID': pistaID,
       'userID': userID,
+      'equipoID': equipoID,
     };
   }
 
@@ -61,6 +65,7 @@ class Reserva {
     DateTime? endAt,
     String? pistaID,
     String? userID,
+    String? equipoID,
   }) {
     return Reserva(
       id: id,
@@ -70,6 +75,7 @@ class Reserva {
       endAt: endAt ?? this.endAt,
       pistaID: pistaID ?? this.pistaID,
       userID: userID ?? this.userID,
+      equipoID: equipoID ?? this.equipoID,
     );
   }
 }
